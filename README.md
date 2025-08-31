@@ -1,4 +1,4 @@
-# Customer Support Touchpoint Unified MoDEL
+# Customer Support Touchpoint Unified Model
 A unified customer touchpoint model is aimed at tracking operational KPIs in the customer support domain.
 
 The objective of this model is to provide easy access for analysing the performance of the customer support department for the European markets.
