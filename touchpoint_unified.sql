@@ -1,7 +1,7 @@
 WITH touchpoint_metrics AS (
     -- Call metrics
     SELECT 
-        'call' as touchpoint_type,
+        'call' as touchpoint_channel,
         fc.customer_id,
         fc.region,
         fc.call_start_time as interaction_date,
@@ -22,7 +22,7 @@ WITH touchpoint_metrics AS (
     
     -- Chat metrics
     SELECT 
-        'chat' as touchpoint_type,
+        'chat' as touchpoint_channel,
         wc.customer_id,
         wc.region,
         wc.chat_start_time as interaction_date,
@@ -43,7 +43,7 @@ WITH touchpoint_metrics AS (
     
     -- Email metrics
     SELECT 
-        'email' as touchpoint_type,
+        'email' as touchpoint_channel,
         sc.customer_id,
         sc.region,
         sc.created_date as interaction_date,
@@ -68,6 +68,10 @@ resolution_metrics AS (
         sc.customer_id,
         sc.region,
         sc.created_date,
+        sc.case_category  as touchpoint_category,
+        sc.case_sub_category as touchpoint_sub_category,
+        sc.product_area,
+        sc.first_contact_resolution BOOLEAN DEFAULT FALSE
         CASE 
             WHEN sc.resolution_time_hours <= 24 AND sc.case_status IN ('resolved', 'closed') THEN 1 
             ELSE 0 
@@ -78,13 +82,16 @@ resolution_metrics AS (
 
 unified_touchpoints AS (
     SELECT 
-        tm.touchpoint_type,
+        tm.touchpoint_channel,
         tm.customer_id,
         mc.customer_name,
         mc.customer_segment,
         tm.region,
         DATE(tm.interaction_date) as interaction_date,
         tm.case_id,
+        rm.touchpoint_category,
+        rm.touchpoint_sub_category,
+        rm.product_area,
         tm.accepted_within_sla,
         tm.response_time_seconds,
         tm.interaction_completed,
@@ -92,7 +99,7 @@ unified_touchpoints AS (
         mc.csat_score,
         mc.csat_date,
         ROW_NUMBER() OVER (
-            PARTITION BY tm.customer_id, tm.touchpoint_type, DATE(tm.interaction_date) 
+            PARTITION BY tm.customer_id, tm.touchpoint_channel, DATE(tm.interaction_date) 
             ORDER BY tm.interaction_date DESC
         ) as daily_interaction_rank
     FROM touchpoint_metrics tm
@@ -102,7 +109,7 @@ unified_touchpoints AS (
 
 -- Final unified model with KPIs
 SELECT 
-    touchpoint_type,
+    touchpoint_channel,
     region,
     interaction_date,
     customer_segment,
@@ -111,18 +118,20 @@ SELECT
     COUNT(*) as total_interactions,
     COUNT(DISTINCT customer_id) as unique_customers,
     COUNT(DISTINCT case_id) as total_cases,
+    COUNT(DISTINCT touchpoint_category) as distinct_touchpoint_categories,
+    COUNT(DISTINCT product_area) as distinct_product_areas,
     
     -- Acceptance Rate KPIs
     ROUND(
-        AVG(CASE WHEN touchpoint_type = 'call' THEN accepted_within_sla END) * 100, 2
+        AVG(CASE WHEN touchpoint_channel = 'call' THEN accepted_within_sla END) * 100, 2
     ) as call_acceptance_rate_pct,
     
     ROUND(
-        AVG(CASE WHEN touchpoint_type = 'chat' THEN accepted_within_sla END) * 100, 2
+        AVG(CASE WHEN touchpoint_channel = 'chat' THEN accepted_within_sla END) * 100, 2
     ) as chat_acceptance_rate_pct,
     
     ROUND(
-        AVG(CASE WHEN touchpoint_type = 'email' THEN accepted_within_sla END) * 100, 2
+        AVG(CASE WHEN touchpoint_channel = 'email' THEN accepted_within_sla END) * 100, 2
     ) as email_acceptance_rate_pct,
     
     -- Resolution Rate KPI
@@ -142,11 +151,11 @@ SELECT
 FROM unified_touchpoints
 WHERE daily_interaction_rank = 1  -- Deduplicate multiple daily interactions
 GROUP BY 
-    touchpoint_type,
+    touchpoint_channel,
     region,
     interaction_date,
     customer_segment
 ORDER BY 
     interaction_date DESC,
     region,
-    touchpoint_type;
+    touchpoint_channel;
