@@ -1,22 +1,26 @@
 # Customer Support Touchpoint Unified Model
 A unified customer touchpoint model was designed to track operational KPIs within the customer support domain.
 
+Please see the [SQL query here](https://github.com/metkapinezic/FinOps_CS_Unified_model/blob/main/touchpoint_unified.sql).
+
 The objective of this model was to provide easy access for analysing the performance of the European markets.
 
-## List of required KPIs:
+## Background information:
+
+### List of required KPIs:
 - Call Acceptance Rate: Percentage of calls answered within 2 minutes
 - Chat Acceptance Rate: Percentage of chats responded to within 30 seconds
 - Email Acceptance Rate: Percentage of emails responded to within 24 hours
 - Issue Resolution Rate: Percentage of cases resolved within 24 hours
 - CSAT Score: Average customer satisfaction rating (1-5 scale)
 
-## Raw data sources that were provided:
+### Raw data sources that were provided:
 - Five9 (call data)
 - WhatsApp (chat data)
 - Salesforce (case data, email data)
 - Merchants (customer data)
 
-## Model development stages:
+### Model development stages:
 - Stage 1: Requirements & KPI Definition
 - Stage 2: Assessment of data sources
 - Stage 3: Data Architecture Design
