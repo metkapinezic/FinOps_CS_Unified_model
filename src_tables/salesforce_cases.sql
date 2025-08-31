@@ -12,8 +12,6 @@ CREATE TABLE salesforce_cases (
     region VARCHAR(10) NOT NULL,
     response_time_hours DECIMAL(10,2),
     resolution_time_hours DECIMAL(10,2),
-    
-    -- Enhanced fields for issue distribution
     case_sub_reason VARCHAR(100),
     case_reason_category VARCHAR(50),
     issue_severity VARCHAR(20) CHECK (issue_severity IN ('critical', 'high', 'medium', 'low')),
