@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support Dashboard - European Markets</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        @media print {
+            body { margin: 0; }
+            .page-break { page-break-before: always; }
+            .no-print { display: none; }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .kpi-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #3b82f6;
+            transition: transform 0.2s;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .kpi-title {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        
+        .kpi-target {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        .kpi-trend {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        .trend-up { color: #059669; }
+        .trend-down { color: #dc2626; }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        td {
+            font-size: 0.9rem;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            min-width: 60px;
+            display: inline-block;
+        }
+        
+        .status-high { background: #dcfce7; color: #166534; }
+        .status-medium { background: #fef3c7; color: #92400e; }
+        .status-low { background: #fee2e2; color: #991b1b; }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>FinOps Customer Support Dashboard</h1>
+            <p> Sample Performance Report</p>
+            <p>Unified Customer Touchpoint Model Analysis</p>
+        </div>
+        
+        <!-- KPI Overview -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">📞 Call Acceptance Rate</div>
+                <div class="kpi-value">89.5%</div>
+                <div class="kpi-target">Target: 90%</div>
+                <div class="kpi-trend trend-up">↗ +2.3% vs last month</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-title">💬 Chat Acceptance Rate</div>
+                <div class="kpi-value">94.2%</div>
+                <div class="kpi-target">Target: 95%</div>
+                <div class="kpi-trend trend-up">↗ +1.8% vs last month</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-title">✉️ Email Acceptance Rate</div>
+                <div class="kpi-value">96.5%</div>
+                <div class="kpi-target">Target: 95%</div>
+                <div class="kpi-trend trend-up">↗ +0.9% vs last month</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-title">✅ Issue Resolution Rate</div>
+                <div class="kpi-value">80.7%</div>
+                <div class="kpi-target">Target: 85%</div>
+                <div class="kpi-trend trend-up">↗ +3.2% vs last month</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-title">⭐ Customer Satisfaction</div>
+                <div class="kpi-value">4.2</div>
+                <div class="kpi-target">Target: 4.0</div>
+                <div class="kpi-trend trend-up">↗ +0.1 vs last month</div>
+            </div>
+            
+            <div class="kpi-card">
+                <div class="kpi-title">👥 Total Interactions</div>
+                <div class="kpi-value">5,785</div>
+                <div class="kpi-target">Monthly volume</div>
+                <div class="kpi-trend trend-up">↗ +8.4% vs last month</div>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="chart-container">
+            <div class="chart-title">Acceptance Rates Trend (Last 3 Months)</div>
+            <div class="chart-wrapper">
+                <canvas id="trendsChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="grid-2">
+            <div class="chart-container">
+                <div class="chart-title">Issue Distribution by Category</div>
+                <div class="chart-wrapper">
+                    <canvas id="issueChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">Regional Performance Comparison</div>
+                <div class="chart-wrapper">
+                    <canvas id="regionalChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Issue Breakdown Table -->
+        <div class="table-container">
+            <div class="chart-title">Issue Category Analysis</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Issue Category</th>
+                        <th>Volume</th>
+                        <th>Avg Resolution (hrs)</th>
+                        <th>CSAT Impact</th>
+                        <th>Volume (Cases)</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Payment & Billing</strong></td>
+                        <td>1,247</td>
+                        <td>8.5</td>
+                        <td>3.8</td>
+                        <td>1,247</td>
+                        <td><span class="status-badge status-low">High Priority</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Product Support</strong></td>
+                        <td>734</td>
+                        <td>12.3</td>
+                        <td>4.1</td>
+                        <td>734</td>
+                        <td><span class="status-badge status-medium">Medium Priority</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Order Management</strong></td>
+                        <td>623</td>
+                        <td>6.7</td>
+                        <td>4.0</td>
+                        <td>623</td>
+                        <td><span class="status-badge status-medium">Medium Priority</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Compliance & Legal</strong></td>
+                        <td>289</td>
+                        <td>18.4</td>
+                        <td>3.9</td>
+                        <td>142.7</td>
+                        <td><span class="status-badge status-medium">Medium Priority</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Account Management</strong></td>
+                        <td>892</td>
+                        <td>4.2</td>
+                        <td>4.3</td>
+                        <td>892</td>
+                        <td><span class="status-badge status-high">Low Priority</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Channel Performance Summary -->
+        <div class="chart-container">
+            <div class="chart-title">Channel Performance Summary</div>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <div class="stat-value">89.5%</div>
+                    <div class="stat-label">Call Acceptance<br>Target: 90%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">94.2%</div>
+                    <div class="stat-label">Chat Acceptance<br>Target: 95%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">96.5%</div>
+                    <div class="stat-label">Email Acceptance<br>Target: 95%</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">98s</div>
+                    <div class="stat-label">Avg Call Response<br>Target: 120s</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">28s</div>
+                    <div class="stat-label">Avg Chat Response<br>Target: 30s</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">4.0h</div>
+                    <div class="stat-label">Avg Email Response<br>Target: 24h</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Regional Breakdown -->
+        <div class="chart-container">
+            <div class="chart-title">Regional Performance Breakdown</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Region</th>
+                        <th>Call Acceptance</th>
+                        <th>Chat Acceptance</th>
+                        <th>Email Acceptance</th>
+                        <th>Resolution Rate</th>
+                        <th>CSAT Score</th>
+                        <th>Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>🇩🇪 Germany</strong></td>
+                        <td>91.8%</td>
+                        <td>95.7%</td>
+                        <td>97.3%</td>
+                        <td>83.6%</td>
+                        <td>4.4</td>
+                        <td>2,156</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🇫🇷 France</strong></td>
+                        <td>88.9%</td>
+                        <td>94.2%</td>
+                        <td>96.1%</td>
+                        <td>80.3%</td>
+                        <td>4.3</td>
+                        <td>1,923</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🇬🇧 United Kingdom</strong></td>
+                        <td>87.4%</td>
+                        <td>93.8%</td>
+                        <td>95.2%</td>
+                        <td>78.1%</td>
+                        <td>4.1</td>
+                        <td>1,706</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Report Generated on Sample Data</strong> 
+            <p>Covering: Five9 Call Data, WhatsApp Chat Data, Salesforce Case Management, Merchant Customer Data</p>
+        </div>
+    </div>
+
+    <script>
+        // Trends Chart
+        const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+        new Chart(trendsCtx, {
+            type: 'line',
+            data: {
+                labels: ['June 2024', 'July 2024', 'August 2024'],
+                datasets: [{
+                    label: 'Call Acceptance %',
+                    data: [84.6, 87.0, 89.5],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Chat Acceptance %',
+                    data: [90.6, 92.6, 94.2],
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Email Acceptance %',
+                    data: [93.4, 94.8, 96.5],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Resolution Rate %',
+                    data: [75.5, 77.6, 80.7],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 70,
+                        max: 100
+                    }
+                }
+            }
+        });
+
+        // Issue Distribution Chart
+        const issueCtx = document.getElementById('issueChart').getContext('2d');
+        new Chart(issueCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Payment & Billing', 'Account Management', 'Product Support', 'Order Management', 'Compliance & Legal'],
+                datasets: [{
+                    data: [1247, 892, 734, 623, 289],
+                    backgroundColor: [
+                        '#ef4444',
+                        '#06b6d4',
+                        '#3b82f6',
+                        '#10b981',
+                        '#f59e0b'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Regional Performance Chart
+        const regionalCtx = document.getElementById('regionalChart').getContext('2d');
+        new Chart(regionalCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Germany', 'France', 'United Kingdom'],
+                datasets: [{
+                    label: 'Call Acceptance %',
+                    data: [91.8, 88.9, 87.4],
+                    backgroundColor: 'rgba(239, 68, 68, 0.8)'
+                }, {
+                    label: 'Chat Acceptance %',
+                    data: [95.7, 94.2, 93.8],
+                    backgroundColor: 'rgba(6, 182, 212, 0.8)'
+                }, {
+                    label: 'Email Acceptance %',
+                    data: [97.3, 96.1, 95.2],
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)'
+                }, {
+                    label: 'Resolution Rate %',
+                    data: [83.6, 80.3, 78.1],
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 70,
+                        max: 100
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
