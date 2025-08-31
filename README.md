@@ -1,4 +1,4 @@
-# FinOps_CS_Unified_model
+# Customer Support Touchpoint Unified MoDEL
 A unified customer touchpoint model is aimed at tracking operational KPIs in the customer support domain.
 
 The objective of this model is to provide easy access for analysing the performance of the customer support department for the European markets.
@@ -16,19 +16,38 @@ Raw data sources that were provided:
 - Salesforce (case data, email data)
 - Merchants (customer data)
 
-Key Model Features:
+Model development stages:
+- Stage 1: Requirements & KPI Definition
+- Stage 2: Assessment of data sources
+- Stage 3: Data Architecture Design
+- Stage 4: Transformation Logic Development
+- Stage 5: Unified Model Implementation
+- Stage 6: Reporting & Visualization
 
-- Data Integration Points
+Model Benefits:
+Operational Benefits:
 
-Customer ID serves as the primary key linking all data sources
-Case ID connects touchpoint interactions to resolution outcomes
-Region field enables European market segmentation
-Timestamp fields allow for SLA compliance calculations
+- Single source of truth for customer support performance
+- Real-time visibility into SLA compliance across all channels
+- Automated KPI calculation eliminating manual reporting
+- Regional performance benchmarking and improvement tracking
 
-- Model Benefits
+Strategic Benefits:
 
-Unified View: Single source of truth for all customer touchpoints
-Performance Tracking: Real-time monitoring of acceptance and resolution rates
-Regional Analysis: Market-specific performance insights
-Trend Analysis: Historical performance tracking and forecasting
-Customer Journey: Complete interaction history per customer
+- Data-driven resource allocation decisions
+- Issue trend identification for product improvement
+- Customer satisfaction correlation analysis
+- European market expansion support through performance insights
+
+Technical Benefits:
+
+- Scalable data architecture supporting future source additions
+- Automated data quality monitoring and alerting
+- Maintainable codebase with clear transformation logic
+
+Analytical Benefits:
+- Unified View: Single source of truth for all customer touchpoints
+- Performance Tracking: Real-time monitoring of acceptance and resolution rates
+- Regional Analysis: Market-specific performance insights
+- Trend Analysis: Historical performance tracking and forecasting
+- Customer Journey: Complete interaction history per customer
