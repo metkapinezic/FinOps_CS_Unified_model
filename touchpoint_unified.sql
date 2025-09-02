@@ -84,8 +84,6 @@ unified_touchpoints AS (
     SELECT 
         tm.touchpoint_channel,
         tm.customer_id,
-        mc.customer_name,
-        mc.customer_segment,
         tm.region,
         DATE(tm.interaction_date) as interaction_date,
         tm.case_id,
@@ -149,7 +147,7 @@ SELECT
     ROUND(AVG(interaction_completed) * 100, 2) as completion_rate_pct
 
 FROM unified_touchpoints
-WHERE daily_interaction_rank = 1  -- Deduplicate multiple daily interactions
+WHERE daily_interaction_rank = 1  -- Deduplicate multiple daily interactions, uses most recent one
 GROUP BY 
     touchpoint_channel,
     region,
